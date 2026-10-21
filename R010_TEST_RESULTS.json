@@ -1,0 +1,69 @@
+{
+  "adSnippetExact": true,
+  "existingBannerRemoved": true,
+  "immutableFiles": true,
+  "inlineJavaScriptSyntax": true,
+  "sampleResponsiveTests": [
+    {
+      "viewport": 320,
+      "columns": 2,
+      "header": "center",
+      "adViewport": 300,
+      "adCanvas": 300,
+      "horizontalOverflow": false,
+      "jsErrors": 0,
+      "searchSort": "PASS"
+    },
+    {
+      "viewport": 390,
+      "columns": 2,
+      "header": "center",
+      "adViewport": 362,
+      "adCanvas": 362,
+      "horizontalOverflow": false,
+      "jsErrors": 0,
+      "searchSort": "PASS"
+    },
+    {
+      "viewport": 600,
+      "columns": 2,
+      "header": "center",
+      "adViewport": 400,
+      "adCanvas": 400,
+      "horizontalOverflow": false,
+      "jsErrors": 0,
+      "searchSort": "PASS"
+    },
+    {
+      "viewport": 601,
+      "columns": 2,
+      "header": "start",
+      "adViewport": 400,
+      "adCanvas": 400,
+      "horizontalOverflow": false,
+      "jsErrors": 0,
+      "searchSort": "PASS"
+    },
+    {
+      "viewport": 900,
+      "columns": 4,
+      "header": "start",
+      "adViewport": 400,
+      "adCanvas": 400,
+      "horizontalOverflow": false,
+      "jsErrors": 0,
+      "searchSort": "PASS"
+    },
+    {
+      "viewport": 1024,
+      "columns": 4,
+      "header": "start",
+      "adViewport": 400,
+      "adCanvas": 400,
+      "horizontalOverflow": false,
+      "jsErrors": 0,
+      "searchSort": "PASS"
+    }
+  ],
+  "thirdPartyAds": "Mocked for layout/JS integration only, live real ad NOT verified"
+}

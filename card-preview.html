@@ -71,9 +71,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .footer-intro p{margin:5px 0 0;color:var(--muted);font-size:12px}
 .partner-banner{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
 .partner-banner-title{font-size:12px;color:var(--muted);font-weight:750}
-.partner-banner a{display:block;width:min(300px,100%);max-width:100%;line-height:0}
-.partner-banner img{max-width:100%;height:auto;aspect-ratio:300/250;object-fit:contain}
-.partner-banner-hint{font-size:11px;color:var(--muted);margin:0}
+/* A fixed 400x400 official carousel is scaled ONLY via an outer wrapper. */
+.partner-carousel-viewport{position:relative;width:min(400px,100%);aspect-ratio:1 / 1;overflow:hidden}
+.partner-carousel-canvas{position:absolute;inset:0 auto auto 0;width:400px;height:400px;transform-origin:0 0}
 .notice{max-width:760px;margin:25px auto 0;background:#f4f5f3;border:1px solid var(--line);padding:16px 19px;border-radius:12px}
 .notice-title{font-size:12px;font-weight:800;margin-bottom:5px}
 .notice p{font-size:12px;line-height:1.8;color:#61717a;margin:0}
@@ -82,7 +82,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 0;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
 @media(min-width:640px) and (max-width:899px){.page{max-width:368px}.products{max-width:368px}}
 @media(min-width:900px){.products{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}}
-@media(max-width:600px){.page{width:calc(100% - 28px)}.nav{padding:18px 0 16px}.intro{padding:25px 0 20px}.intro h1{font-size:25px}.intro p{font-size:12px}.search-wrap{height:52px}.catalog-toolbar{margin-top:25px}.catalog-title h2{font-size:19px}.products{gap:10px}.product-head{padding:10px 10px 0;min-height:38px}.catalog-toolbar{gap:8px}.sort-group{gap:5px}.sort-select{font-size:11px;max-width:137px;padding:7px 4px}}
+@media(max-width:600px){.page{width:calc(100% - 28px)}.nav{padding:18px 0 16px;text-align:center}.intro{padding:25px 0 20px;text-align:center}.intro h1{font-size:25px}.intro p{font-size:12px}.search-wrap{height:52px}.catalog-toolbar{margin-top:25px}.catalog-title h2{font-size:19px}.products{gap:10px}.product-head{padding:10px 10px 0;min-height:38px}.catalog-toolbar{gap:8px}.sort-group{gap:5px}.sort-select{font-size:11px;max-width:137px;padding:7px 4px}}
 @media(max-width:340px){.page{width:calc(100% - 20px)}.products{gap:8px}.product-head{padding:10px 8px 0}}
 @media(max-width:305px){.products{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
@@ -105,13 +105,12 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
       </label>
       <div class="catalog-toolbar">
         <div class="catalog-title"><h2 id="items-title">전체 상품</h2><span id="itemCount" class="count">0개</span></div>
-        <label class="sort-group" for="sort">정렬
-          <select id="sort" class="sort-select">
-            <option value="newest">최신 등록순</option>
-            <option value="oldest">오래된순</option>
-            <option value="number">상품번호순</option>
+        <div class="sort-group">
+          <select id="sort" class="sort-select" aria-label="상품 정렬">
+            <option value="newest">최신 순</option>
+            <option value="oldest">오래된 순</option>
           </select>
-        </label>
+        </div>
       </div>
       <p id="resultCount" class="result-count" aria-live="polite">0개 표시</p>
       <div id="products" class="products" aria-live="polite"></div>
@@ -261,7 +260,6 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
         const num = i => Number(i.id) || 0;
         switch (sortEl.value) {
           case 'oldest': return sorted.sort((a,b) => date(a).localeCompare(date(b)) || num(a)-num(b));
-          case 'number': return sorted.sort((a,b) => num(a)-num(b));
           default: return sorted.sort((a,b) => date(b).localeCompare(date(a)) || num(b)-num(a));
         }
       }
