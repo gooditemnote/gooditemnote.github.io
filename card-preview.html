@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fafaf8" />
+  <meta name="description" content="좋은물건노트 쇼츠에서 소개한 생활 아이템을 번호로 쉽고 빠르게 찾아보세요. 제휴 상품 목록." />
+  <meta property="og:title" content="좋은물건노트 | 영상 속 그 물건" />
+  <meta property="og:description" content="쇼츠에서 본 상품을 번호로 찾는 작은 아이템 노트" />
+  <title>상품 카드 디자인 미리보기</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <style>
+:root{--bg:#fafaf8;--ink:#253e4a;--muted:#64737b;--line:#e2e7e7;--gold:#b69b69;--card:#fff;--subtle:#f1f4f3;--shadow:0 5px 20px rgba(37,62,74,.035);color-scheme:light}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+a,button,input,select{font:inherit}
+a{color:inherit}button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.page{width:min(100% - 40px,752px);margin:0 auto;padding:0 0 55px}
+.nav{padding:27px 0 21px;border-bottom:1px solid var(--line)}
+.identity{font-size:clamp(20px,3.5vw,25px);font-weight:850;letter-spacing:-1.1px;text-decoration:none}
+.intro{padding:34px 0 23px}
+.intro h1{margin:0;font-size:clamp(24px,4vw,34px);letter-spacing:-1.2px;line-height:1.35;word-break:keep-all;font-weight:800}
+.intro p{margin:8px 0 0;font-size:14px;color:var(--muted);word-break:keep-all}
+.search-wrap{display:flex;align-items:center;gap:11px;height:58px;border:1px solid #cad4d6;background:var(--card);border-radius:12px;padding:0 15px;transition:border-color .15s,box-shadow .15s}
+.search-wrap:focus-within{border-color:#738e9d;box-shadow:0 0 0 3px rgba(70,106,125,.12)}
+.search-icon{width:20px;height:20px;flex:none;color:#587181}
+.search{min-width:0;width:100%;background:transparent;color:var(--ink);font-size:15px;border:0;outline:none}
+.search:focus{outline:none}.search::placeholder{color:#829198}
+.clear{display:none;border:0;background:transparent;color:var(--ink);font-size:12px;font-weight:700;padding:9px}
+.catalog-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:31px 0 16px;flex-wrap:wrap}
+.catalog-title{display:flex;gap:10px;align-items:baseline;min-width:0}
+.catalog-title h2{margin:0;font-size:21px;letter-spacing:-.7px;font-weight:800}
+.catalog-title .count{font-size:12px;font-weight:650;color:var(--muted)}
+.sort-group{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.sort-select{min-height:44px;max-width:150px;padding:9px 28px 9px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink);font-size:13px;font-weight:700}
+.result-count{font-size:12px;color:var(--muted);margin:0 0 13px}
+/* The official partner HTML is immutable. Style only these outer containers. */
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:752px;margin:0 auto}
+.product{min-width:0;border-radius:14px;background:var(--card);border:1px solid #d8e0e3;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.product:focus-within{outline:2px solid var(--ink);outline-offset:3px}
+.product-head{display:flex;align-items:center;padding:12px 12px 0;min-height:40px}
+.product-number{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:28px;padding:0 9px;border-radius:7px;background:var(--ink);color:#fff;font-size:14px;line-height:1;font-weight:800;letter-spacing:.05em;font-variant-numeric:tabular-nums}
+.partner-slot{display:flex;align-items:flex-start;justify-content:center;min-height:268px;padding:12px 8px 16px;line-height:0}
+.legacy-card .photo{margin-top:12px}.legacy-card .content{padding:14px 12px}.legacy-card h3{font-size:14px}.legacy-card .cta{font-size:12px}
+.partner-pending{align-self:center;margin:0;padding:12px 0;color:var(--muted);font-size:12px;line-height:1.6;text-align:center;word-break:keep-all}
+.photo{width:100%;aspect-ratio:1 / 1;background:#f1f3f2;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:contain;background:#fff;display:block}
+.image-pending{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;color:#778890;text-align:center}
+.image-pending svg{height:34px;width:34px;opacity:.65}
+.image-pending span{font-size:12px;letter-spacing:-.1px;font-weight:600}
+.content{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.id{font-size:12px;color:#8b774e;font-weight:800;letter-spacing:.4px}
+.product h3{margin:0;font-size:16px;line-height:1.43;font-weight:790;letter-spacing:-.5px;word-break:keep-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.8em}
+.summary{font-size:12px;color:var(--muted);margin:0 0 7px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.cta{display:flex;justify-content:center;align-items:center;min-height:46px;width:100%;padding:9px 10px;text-decoration:none;text-align:center;background:var(--ink);color:white;border:1px solid var(--ink);border-radius:10px;font-size:13px;font-weight:750;transition:background .15s,transform .15s;margin-top:auto;white-space:nowrap}
+.cta:hover{background:#3a5868}.cta:active{transform:scale(.98)}
+.cta-disabled{background:#f0f2f3;border-color:#f0f2f3;color:#73828b;cursor:not-allowed}
+.cta-disabled:hover{background:#f0f2f3}
+.meta{display:none}
+
+.empty{grid-column:1/-1;text-align:center;background:white;border:1px dashed #cad3d6;padding:50px 16px;border-radius:13px;color:var(--muted)}
+.empty strong{display:block;font-size:18px;color:var(--ink);margin-bottom:8px}
+.load-area{text-align:center;margin:24px 0 0}
+.load-more{min-height:46px;padding:12px 26px;border:1px solid var(--ink);border-radius:10px;background:white;color:var(--ink);font-size:13px;font-weight:750}
+.load-more:hover{background:#edf1f2}
+.load-more[hidden]{display:none}
+.footer-intro{text-align:center;margin:52px 0 21px;border-top:1px solid var(--line);padding-top:27px}
+.footer-intro strong{font-size:18px;letter-spacing:-.5px}
+.footer-intro p{margin:5px 0 0;color:var(--muted);font-size:12px}
+.partner-banner{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.partner-banner-title{font-size:12px;color:var(--muted);font-weight:750}
+.partner-banner a{display:block;width:min(300px,100%);max-width:100%;line-height:0}
+.partner-banner img{max-width:100%;height:auto;aspect-ratio:300/250;object-fit:contain}
+.partner-banner-hint{font-size:11px;color:var(--muted);margin:0}
+.notice{max-width:760px;margin:25px auto 0;background:#f4f5f3;border:1px solid var(--line);padding:16px 19px;border-radius:12px}
+.notice-title{font-size:12px;font-weight:800;margin-bottom:5px}
+.notice p{font-size:12px;line-height:1.8;color:#61717a;margin:0}
+.back-top-wrap{display:flex;justify-content:center;margin:25px 0}
+.back-top{min-height:44px;border:1px solid #bdc9cf;border-radius:9px;background:white;color:var(--ink);padding:10px 19px;font-size:12px;font-weight:800}
+footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 0;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+@media(min-width:640px) and (max-width:899px){.page{max-width:368px}.products{max-width:368px}}
+@media(min-width:900px){.products{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}}
+@media(max-width:600px){.page{width:calc(100% - 28px)}.nav{padding:18px 0 16px}.intro{padding:25px 0 20px}.intro h1{font-size:25px}.intro p{font-size:12px}.search-wrap{height:52px}.catalog-toolbar{margin-top:25px}.catalog-title h2{font-size:19px}.products{gap:10px}.product-head{padding:10px 10px 0;min-height:38px}.catalog-toolbar{gap:8px}.sort-group{gap:5px}.sort-select{font-size:11px;max-width:137px;padding:7px 4px}}
+@media(max-width:340px){.page{width:calc(100% - 20px)}.products{gap:8px}.product-head{padding:10px 8px 0}}
+@media(max-width:305px){.products{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+</style>
+</head>
+<body>
+  <main class="page">
+    <header class="nav">
+      <a class="identity" href="./" aria-label="좋은물건노트 홈">좋은물건노트</a>
+    </header>
+    <section class="intro" aria-labelledby="hero-title">
+      <h1 id="hero-title">상품 카드 미리보기</h1>
+      <p>등록된 001·002 상품의 카드 디자인을 확인하는 미리보기입니다.</p>
+    </section>
+    <section aria-labelledby="items-title">
+      <label class="search-wrap" for="search">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <input id="search" class="search" type="search" placeholder="상품번호 입력 (예: 001, 002)" autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="4" aria-label="상품번호 검색" />
+        <button type="button" id="clear" class="clear" aria-label="검색어 지우기">지우기</button>
+      </label>
+      <div class="catalog-toolbar">
+        <div class="catalog-title"><h2 id="items-title">전체 상품</h2><span id="itemCount" class="count">0개</span></div>
+        <label class="sort-group" for="sort">정렬
+          <select id="sort" class="sort-select">
+            <option value="newest">최신 등록순</option>
+            <option value="oldest">오래된순</option>
+            <option value="number">상품번호순</option>
+          </select>
+        </label>
+      </div>
+      <p id="resultCount" class="result-count" aria-live="polite">0개 표시</p>
+      <div id="products" class="products" aria-live="polite"></div>
+      <div class="load-area"><button type="button" id="loadMore" class="load-more" hidden>상품 12개 더보기</button></div>
+    </section>
+    <section class="footer-intro" aria-label="좋은물건노트 소개">
+      <strong>좋은물건노트</strong>
+      <p>영상 속 좋은 물건들을 한곳에</p>
+    </section>
+    <section class="notice" aria-label="제휴 안내">
+      <div class="notice-title">제휴 링크 안내</div>
+      <p>이 사이트에는 쿠팡 파트너스 제휴 링크가 포함될 수 있으며, 링크를 통한 구매 시 일정액의 수수료를 제공받을 수 있습니다. 구매 가격에 추가 요금이 붙는다는 의미는 아닙니다. 상품 가격과 옵션, 배송 조건은 판매 페이지에서 최종 확인해 주세요.</p>
+    </section>
+    <div class="back-top-wrap"><button id="backTop" class="back-top" type="button">↑ 맨 위로</button></div>
+    <footer><span>© 2026 좋은물건노트</span><span>우리의 작은 발견을 모으는 노트</span></footer>
+  </main>
+  <script src="products.js"></script>
+  <script>
+    (() => {
+      'use strict';
+      const source = Array.isArray(window.GOODNOTE_PRODUCTS) ? window.GOODNOTE_PRODUCTS : [];
+      // Text metadata is rendered with textContent. The approved partner HTML is checked, then inserted verbatim.
+      const items = source.filter(item => item && /^\d{3,}$/.test(String(item.id)) && typeof item.name === 'string');
+      let visibleCount = 12;
+      const pageSize = 12;
+      const productEl = document.getElementById('products');
+      const searchEl = document.getElementById('search');
+      const clearEl = document.getElementById('clear');
+      const totalEl = document.getElementById('itemCount');
+      const resultEl = document.getElementById('resultCount');
+      const sortEl = document.getElementById('sort');
+      const loadEl = document.getElementById('loadMore');
+      const normalizeIdQuery = value => String(value ?? '').normalize('NFKC').trim();
+      const outbound = (url, domains) => {
+        try {
+          const parsed = new URL(url);
+          return parsed.protocol === 'https:' && domains.includes(parsed.hostname) ? parsed.href : null;
+        } catch { return null; }
+      };
+      const partnerURL = url => outbound(url, ['link.coupang.com', 'coupa.ng']);
+      const videoURL = url => outbound(url, ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be']);
+      const el = (tag, className, text) => {
+        const n = document.createElement(tag);
+        if (className) n.className = className;
+        if (text !== undefined) n.textContent = String(text);
+        return n;
+      };
+      function pendingImage() {
+        const box = el('div','image-pending');
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('fill','none');
+        svg.setAttribute('stroke','currentColor'); svg.setAttribute('stroke-width','1.5');
+        svg.setAttribute('stroke-linecap','round'); svg.setAttribute('stroke-linejoin','round');
+        svg.setAttribute('aria-hidden','true');
+        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        rect.setAttribute('x','3');rect.setAttribute('y','4');rect.setAttribute('width','18');rect.setAttribute('height','16');rect.setAttribute('rx','2');
+        const path=document.createElementNS('http://www.w3.org/2000/svg','path'); path.setAttribute('d','m3 16 5-5 4 4 3-3 6 6');
+        svg.append(rect,path); box.append(svg,el('span','', '실제 사진 준비 중'));
+        return box;
+      }
+      function legacyCard(data) {
+        const outer = el('article', 'product legacy-card');
+        outer.setAttribute('aria-label', `상품번호 ${data.id}, ${data.name}`);
+        const head = el('div', 'product-head');
+        head.append(el('span', 'product-number', data.id));
+        const photo = el('div', 'photo');
+        const imageSrc = typeof data.imageUrl === 'string' ? data.imageUrl : '';
+        const localImageOK = /^\.\/assets\/[a-zA-Z0-9_./-]+\.(png|jpe?g|webp|avif)$/i.test(imageSrc) && !imageSrc.includes('..');
+        // Only allow the exact Coupang Partner product-thumbnail CDN as a remote source.
+        const remoteImageOK = (() => {
+          try {
+            const u = new URL(imageSrc);
+            return u.protocol === 'https:' && u.hostname === 't4a.coupangcdn.com'
+              && u.pathname.startsWith('/thumbnails/remote/')
+              && /\.(png|jpe?g|webp|avif)$/i.test(u.pathname);
+          } catch { return false; }
+        })();
+        if (localImageOK || remoteImageOK) {
+          const img = el('img'); img.alt = `${data.name} 상품 이미지`; img.src = imageSrc; img.loading = 'lazy';
+          img.decoding = 'async'; img.referrerPolicy = 'no-referrer';
+          img.addEventListener('error', () => { img.remove(); photo.replaceChildren(pendingImage()); });
+          photo.append(img);
+        } else photo.append(pendingImage());
+        const content = el('div', 'content');
+        content.append(el('h3', '', data.name));
+        content.append(el('p', 'summary', data.feature || data.summary || '상품 상세 정보 확인 중'));
+        const link = partnerURL(data.affiliateUrl);
+        if (link) {
+          const a = el('a', 'cta', '상품 확인하기 ↗'); a.href=link; a.target='_blank';
+          a.rel='noopener noreferrer sponsored'; a.setAttribute('aria-label', `${data.name}, 쿠팡에서 상품 확인하기`); content.append(a);
+        } else {
+          const b = el('button', 'cta cta-disabled', '구매 링크 준비 중'); b.type='button';
+          b.disabled=true; b.title='제휴 링크 확인 후 활성화됩니다'; content.append(b);
+        }
+        const meta = el('div', 'meta');
+        const video = videoURL(data.videoUrl);
+        if (video) {
+          const a=el('a','video-link','쇼츠 보기 ↗'); a.href=video; a.rel='noopener noreferrer'; a.target='_blank'; meta.append(a);
+        } else meta.append(el('span','',`#${data.id}`));
+        content.append(meta); outer.append(head,photo,content); return outer;
+      }
+      // Parse a detached template for validation only. Never rebuild, trim, or
+      // add attributes to the user's partner HTML, and never restyle its iframe.
+      function approvedPartnerHTML(raw) {
+        if (typeof raw !== 'string' || !raw.trim() || raw.length > 20000) return false;
+        const probe = document.createElement('template');
+        probe.innerHTML = raw;
+        const nodes = Array.from(probe.content.childNodes);
+        if (nodes.some(n => n.nodeType !== Node.ELEMENT_NODE &&
+            !(n.nodeType === Node.TEXT_NODE && !n.textContent.trim()))) return false;
+        const elements = nodes.filter(n => n.nodeType === Node.ELEMENT_NODE);
+        if (elements.length !== 1 || elements[0].tagName !== 'IFRAME') return false;
+        const frame = elements[0];
+        const allowed = new Set(['src','width','height','frameborder','scrolling','referrerpolicy','title','loading','allowfullscreen']);
+        if (Array.from(frame.attributes).some(a => !allowed.has(a.name))) return false;
+        const src = frame.getAttribute('src');
+        if (!src || !partnerURL(src)) return false;
+        try {
+          const url = new URL(src);
+          if (url.username || url.password || (url.port && url.port !== '443') || !url.pathname.replace(/\//g, '')) return false;
+        } catch { return false; }
+        return !frame.textContent.trim();
+      }
+      function card(data) {
+        // Keep existing products intact until THEIR official HTML is supplied.
+        if (!Object.prototype.hasOwnProperty.call(data, 'partnerHtml')) return legacyCard(data);
+        const outer = el('article', 'product');
+        outer.setAttribute('aria-label', `상품번호 ${data.id}, ${data.name}`);
+        const head = el('div', 'product-head');
+        const badge = el('span', 'product-number', data.id);
+        badge.setAttribute('aria-label', `상품번호 ${data.id}`);
+        head.append(badge);
+        const slot = el('div', 'partner-slot');
+        if (approvedPartnerHTML(data.partnerHtml)) {
+          // Insert the EXACT supplied string; all styling belongs to the wrapper.
+          slot.insertAdjacentHTML('beforeend', data.partnerHtml);
+        } else {
+          slot.append(el('p', 'partner-pending', '상품 정보를 준비하고 있어요.'));
+        }
+        outer.append(head, slot);
+        return outer;
+      }
+      let displayedIds = null;
+      function sortItems(list) {
+        const sorted = [...list];
+        const date = i => /^\d{4}-\d{2}-\d{2}$/.test(String(i.publishedAt)) ? String(i.publishedAt) : '0000-00-00';
+        const num = i => Number(i.id) || 0;
+        switch (sortEl.value) {
+          case 'oldest': return sorted.sort((a,b) => date(a).localeCompare(date(b)) || num(a)-num(b));
+          case 'number': return sorted.sort((a,b) => num(a)-num(b));
+          default: return sorted.sort((a,b) => date(b).localeCompare(date(a)) || num(b)-num(a));
+        }
+      }
+      function matched() {
+        const number = normalizeIdQuery(searchEl.value);
+        // Search exclusively by fixed product ID. Incomplete input (0, 00) shows
+        // prefix matches while the visitor types; item names never affect results.
+        return sortItems(items.filter(item => !number || (/^\d+$/.test(number) && String(item.id).startsWith(number))));
+      }
+      function render() {
+        const q = searchEl.value.trim(); clearEl.style.display = q ? 'block' : 'none';
+        const list = matched();
+        const showing = list.slice(0,visibleCount);
+        // Keep the live iframe in place when a search still shows the same items.
+        const nextIds = showing.map(item => item.id).join('|');
+        if (nextIds !== displayedIds) {
+          productEl.replaceChildren(...showing.map(card));
+          displayedIds = nextIds;
+        }
+        totalEl.textContent=`총 ${items.length}개`;
+        resultEl.textContent=`${list.length}개 중 ${showing.length}개 표시`;
+        const remaining=list.length-showing.length;
+        loadEl.hidden = remaining <= 0;
+        if (remaining > 0) loadEl.textContent=`상품 ${Math.min(pageSize,remaining)}개 더보기`;
+        if (list.length === 0 && !productEl.querySelector('.empty')) {
+          const empty=el('div','empty'); empty.append(el('strong','', '찾는 상품이 없어요'));
+          empty.append(el('span','', /^\d+$/.test(normalizeIdQuery(searchEl.value)) ? '상품번호를 다시 확인해 주세요.' : '상품번호는 숫자만 입력해 주세요.')); productEl.append(empty);
+        }
+      }
+      function reset() { visibleCount=pageSize; render(); }
+      searchEl.addEventListener('input', reset);
+      clearEl.addEventListener('click',()=>{searchEl.value='';searchEl.focus();reset();});
+      sortEl.addEventListener('change',reset);
+      loadEl.addEventListener('click',()=>{visibleCount+=pageSize;render();});
+      document.getElementById('backTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
+      const qItem=new URLSearchParams(location.search).get('item');
+      if(qItem && /^\d{1,5}$/.test(qItem)) searchEl.value=qItem.padStart(3,'0');
+      render();
+    })();
+  </script>
+</body>
+</html>

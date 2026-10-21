@@ -7,6 +7,7 @@
   "summary": "실제로 확인된 정보에 근거해 작성한 짧은 상품 설명",
   "feature": "확인된 핵심 특징",
   "note": "해당하는 경우 실제 후기의 주의사항",
+  "partnerHtml": "",
   "affiliateUrl": "",
   "imageUrl": "",
   "videoUrl": "",

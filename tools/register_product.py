@@ -4,6 +4,7 @@
 This is the final data-write step after ChatGPT/browser has verified the
 Coupang item. It does NOT scrape Coupang, invent reviews, or generate affiliate
 tracking links. It preserves previous cards and checks identifiers/URLs.
+Supplied partner HTML is inspected without rewriting its source text.
 """
 from __future__ import annotations
 
@@ -12,12 +13,86 @@ import datetime as dt
 import json
 import re
 import sys
+import tempfile
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCTS = ROOT / 'products.js'
 PREFIX = '// 좋은물건노트 상품 데이터: 화면 공개용 내용만 기록합니다.\nwindow.GOODNOTE_PRODUCTS = '
+
+
+class PartnerIframeParser(HTMLParser):
+    """Inspect the supplied markup; never rebuild it from parsed attributes."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=False)
+        self.started = False
+        self.finished = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag != 'iframe' or self.started:
+            raise ValueError('partnerHtml에는 단일 iframe만 넣어 주세요.')
+        self.started = True
+        names = [name for name, _ in attrs]
+        allowed = {'src', 'width', 'height', 'frameborder', 'scrolling',
+                   'referrerpolicy', 'title', 'loading', 'allowfullscreen'}
+        if len(names) != len(set(names)):
+            raise ValueError('partnerHtml에 중복 속성이 있습니다. 원문을 다시 확인하세요.')
+        if any(name.startswith('on') or name == 'srcdoc' for name in names):
+            raise ValueError('partnerHtml에는 이벤트 속성이나 srcdoc을 넣을 수 없습니다.')
+        if any(name not in allowed for name in names):
+            raise ValueError('partnerHtml에 화면에서 지원하지 않는 속성이 있습니다. 원문을 바꾸지 않고 등록을 중단합니다.')
+        src = dict(attrs).get('src')
+        if not isinstance(src, str) or not src or re.search(r'[\x00-\x20\x7f]', src):
+            raise ValueError('partnerHtml에 정상적인 쿠팡 파트너스 src가 필요합니다.')
+        parsed = urlsplit(src)
+        if (parsed.scheme != 'https'
+                or parsed.hostname not in ('coupa.ng', 'link.coupang.com')
+                or parsed.username or parsed.password
+                or parsed.port not in (None, 443) or not parsed.path.strip('/')):
+            raise ValueError('iframe src는 HTTPS 쿠팡 파트너스 주소여야 합니다.')
+
+    def handle_endtag(self, tag):
+        if tag != 'iframe' or not self.started or self.finished:
+            raise ValueError('partnerHtml의 iframe 닫는 태그를 확인하세요.')
+        self.finished = True
+
+    def handle_data(self, data):
+        if data and not data.isspace():
+            raise ValueError('partnerHtml에는 iframe 이외의 내용을 넣을 수 없습니다.')
+
+    def reject_extra(self, *args):
+        raise ValueError('partnerHtml에는 추가 태그·주석·선언·텍스트를 넣을 수 없습니다.')
+
+    handle_startendtag = reject_extra
+    handle_comment = reject_extra
+    handle_decl = reject_extra
+    unknown_decl = reject_extra
+    handle_pi = reject_extra
+    handle_entityref = reject_extra
+    handle_charref = reject_extra
+
+
+def approved_partner_html(raw):
+    if not isinstance(raw, str) or not raw:
+        raise ValueError('partnerHtml에 해당 상품의 쿠팡 공식 HTML 원문이 필요합니다.')
+    if len(raw) > 20000:
+        raise ValueError('partnerHtml이 너무 깁니다. 단일 상품의 원문을 확인하세요.')
+    # HTMLParser is forgiving about malformed HTML. Require a complete, quoted
+    # or unquoted attribute grammar as well, rather than silently repairing it.
+    space = r'[\t\n\f\r ]'
+    attribute = r'''[A-Za-z_:][A-Za-z0-9_:.-]*(?:[\t\n\f\r ]*=[\t\n\f\r ]*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?'''
+    shape = rf'{space}*<iframe(?:{space}+{attribute})*{space}*>{space}*</iframe{space}*>{space}*'
+    if not re.fullmatch(shape, raw, flags=re.IGNORECASE):
+        raise ValueError('partnerHtml은 완전히 닫힌 iframe 원문이어야 합니다. 자동 보정하지 않습니다.')
+    parser = PartnerIframeParser()
+    parser.feed(raw)
+    parser.close()
+    if not parser.started or not parser.finished or parser.rawdata:
+        raise ValueError('partnerHtml의 iframe 원문이 완전하지 않습니다.')
+    return raw
 
 
 def read_products():
@@ -93,6 +168,7 @@ def trimmed(obj,key,required=False,cap=180):
 def validate(item,existing):
     if not isinstance(item,dict):
         raise ValueError('입력 파일은 JSON 객체여야 합니다.')
+    partner_html = approved_partner_html(item.get('partnerHtml'))
     existing_ids=[int(str(p['id'])) for p in existing]
     expected=max(existing_ids,default=0)+1
     requested=item.get('id')
@@ -134,6 +210,7 @@ def validate(item,existing):
         'id': f'{number:03d}', 'name':title, 'category':category,
         'summary':summary,'feature':feature,'note':note,
         'affiliateUrl':affiliate,'imageUrl':image,'videoUrl':video,
+        'partnerHtml':partner_html,
         'publishedAt':published,'sourceProductId':source_id,'sourceItemId':source_item_id
     }
 
@@ -141,18 +218,41 @@ def validate(item,existing):
 def main():
     parser=argparse.ArgumentParser(description='검증 완료된 상품 1개를 좋은물건노트 상품 목록에 등록')
     parser.add_argument('--input',required=True,help='상품 검증 정보 JSON 파일 경로')
+    parser.add_argument('--partner-html-file',help='쿠팡 공식 HTML 원문 UTF-8 파일 경로 (줄바꿈 포함 그대로 보관)')
     parser.add_argument('--dry-run',action='store_true',help='실제 파일을 변경하지 않고 검사만 수행')
     args=parser.parse_args()
     item=json.loads(Path(args.input).read_text(encoding='utf-8-sig'))
+    if not isinstance(item, dict):
+        raise ValueError('입력 파일은 JSON 객체여야 합니다.')
+    if args.partner_html_file:
+        raw = Path(args.partner_html_file).read_bytes().decode('utf-8')
+        supplied = item.get('partnerHtml', '')
+        if supplied != '' and supplied != raw:
+            raise ValueError('JSON의 partnerHtml과 HTML 파일 원문이 다릅니다. 원문 하나로 맞춰 주세요.')
+        item['partnerHtml'] = raw
     original=read_products()
     card=validate(item,original)
+    updated=original+[card]
+    serialized=json.dumps(updated,ensure_ascii=False,indent=2)
+    restored=json.loads(serialized)
+    if any(saved.get('partnerHtml') != before.get('partnerHtml')
+           for before, saved in zip(updated, restored)):
+        raise ValueError('HTML 원문 보존 검사에 실패하여 저장하지 않습니다.')
     if not args.dry_run:
-        updated=original+[card]
-        result=PREFIX+json.dumps(updated,ensure_ascii=False,indent=2)+';\n'
-        PRODUCTS.write_text(result,encoding='utf-8')
+        result=PREFIX+serialized+';\n'
+        temporary = None
+        try:
+            with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',newline='',
+                                             dir=PRODUCTS.parent,delete=False) as output:
+                temporary = Path(output.name)
+                output.write(result)
+            temporary.replace(PRODUCTS)
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
     print(f"{'검증만 완료' if args.dry_run else '등록 완료'}: #{card['id']} {card['name']}")
-    print(f"구매 버튼: {'활성화' if card['affiliateUrl'] else '제휴 URL 미확인으로 비활성화'}")
-    print(f"이미지: {'등록됨' if card['imageUrl'] else '이미지 준비 중 표시'}")
+    print('쿠팡 공식 HTML: 원문 보존 검사 완료 (상품번호·배치·테두리는 바깥에서 표시)')
+    print(f"기존 제휴 URL: {'보관됨' if card['affiliateUrl'] else '별도 URL 없음'}")
 
 
 if __name__=='__main__':

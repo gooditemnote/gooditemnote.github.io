@@ -12,6 +12,22 @@ window.GOODNOTE_PRODUCTS = [
     "videoUrl": "",
     "publishedAt": "2026-10-21",
     "sourceProductId": "7281942597",
-    "sourceItemId": "18687407251"
+    "sourceItemId": "18687407251",
+    "partnerHtml": "<iframe src=\"https://coupa.ng/cqkhQb\" width=\"120\" height=\"240\" frameborder=\"0\" scrolling=\"no\" referrerpolicy=\"unsafe-url\"></iframe>"
+  },
+  {
+    "id": "002",
+    "name": "철제 시스템 드레스룸 행거",
+    "category": "수납·정리",
+    "summary": "드레스룸에서 의류를 정리할 때 사용하는 철제 행거입니다.",
+    "feature": "의류 정리용 철제 행거",
+    "note": "",
+    "affiliateUrl": "",
+    "imageUrl": "",
+    "videoUrl": "",
+    "partnerHtml": "<iframe src=\"https://coupa.ng/cqkhNh\" width=\"120\" height=\"240\" frameborder=\"0\" scrolling=\"no\" referrerpolicy=\"unsafe-url\"></iframe>",
+    "publishedAt": "2026-10-22",
+    "sourceProductId": "9476453580",
+    "sourceItemId": "28210816976"
   }
 ];
