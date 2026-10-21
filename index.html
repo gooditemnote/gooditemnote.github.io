@@ -173,9 +173,19 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
         const outer = el('article', 'product');
         const photo = el('div', 'photo');
         const imageSrc = typeof data.imageUrl === 'string' ? data.imageUrl : '';
-        const imageOK = /^\.\/assets\/[a-zA-Z0-9_./-]+\.(png|jpe?g|webp|avif)$/i.test(imageSrc) && !imageSrc.includes('..');
-        if (imageOK) {
+        const localImageOK = /^\.\/assets\/[a-zA-Z0-9_./-]+\.(png|jpe?g|webp|avif)$/i.test(imageSrc) && !imageSrc.includes('..');
+        // Only allow the exact Coupang Partner product-thumbnail CDN as a remote source.
+        const remoteImageOK = (() => {
+          try {
+            const u = new URL(imageSrc);
+            return u.protocol === 'https:' && u.hostname === 't4a.coupangcdn.com'
+              && u.pathname.startsWith('/thumbnails/remote/')
+              && /\.(png|jpe?g|webp|avif)$/i.test(u.pathname);
+          } catch { return false; }
+        })();
+        if (localImageOK || remoteImageOK) {
           const img = el('img'); img.alt = `${data.name} 상품 이미지`; img.src = imageSrc; img.loading = 'lazy';
+          img.decoding = 'async'; img.referrerPolicy = 'no-referrer';
           img.addEventListener('error', () => { img.remove(); photo.replaceChildren(pendingImage()); });
           photo.append(img);
         } else photo.append(pendingImage());
