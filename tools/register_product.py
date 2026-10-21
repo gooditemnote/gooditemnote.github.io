@@ -152,7 +152,7 @@ def main():
         PRODUCTS.write_text(result,encoding='utf-8')
     print(f"{'검증만 완료' if args.dry_run else '등록 완료'}: #{card['id']} {card['name']}")
     print(f"구매 버튼: {'활성화' if card['affiliateUrl'] else '제휴 URL 미확인으로 비활성화'}")
-    print(f"이미지: {'등록됨' if card['imageUrl'] else '대체 이미지 표시'}")
+    print(f"이미지: {'등록됨' if card['imageUrl'] else '이미지 준비 중 표시'}")
 
 
 if __name__=='__main__':
