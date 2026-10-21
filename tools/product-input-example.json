@@ -1,0 +1,14 @@
+{
+  "id": "002",
+  "sourceUrl": "https://www.coupang.com/vp/products/9999999999?itemId=8888888888",
+  "brandTokens": ["검수용브랜드명"],
+  "name": "일반 상품명",
+  "category": "생활·정리",
+  "summary": "실제로 확인된 정보에 근거해 작성한 짧은 상품 설명",
+  "feature": "확인된 핵심 특징",
+  "note": "해당하는 경우 실제 후기의 주의사항",
+  "affiliateUrl": "",
+  "imageUrl": "",
+  "videoUrl": "",
+  "publishedAt": "2026-10-21"
+}
