@@ -181,6 +181,13 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
       const sortEl = document.getElementById('sort');
       const loadEl = document.getElementById('loadMore');
       const normalizeIdQuery = value => String(value ?? '').normalize('NFKC').trim();
+      // Privacy-minimal GTM dataLayer signals. These describe only real on-site
+      // search/content views. TikTok mapping is configured separately in GTM.
+      // Do not infer affiliate iframe clicks, purchases, prices or customer data.
+      const trackGtm = detail => {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push(detail);
+      };
       const outbound = (url, domains) => {
         try {
           const parsed = new URL(url);
@@ -326,15 +333,58 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
           empty.append(el('span','', /^\d+$/.test(normalizeIdQuery(searchEl.value)) ? '상품번호를 다시 확인해 주세요.' : '상품번호는 숫자만 입력해 주세요.')); productEl.append(empty);
         }
       }
+      // TikTok standard events are NOT sent automatically from the site:
+      // GTM must map the two custom dataLayer events below to Search/ViewContent.
+      // There is intentionally no Purchase, value or currency signal.
+      let searchTimer = null;
+      let lastTrackedSearch = null;
+      function trackProductView(product) {
+        trackGtm({
+          event: 'goodnote_view_content',
+          content_type: 'product',
+          content_ids: [String(product.id)]
+        });
+      }
+      function trackCommittedSearch() {
+        const query = normalizeIdQuery(searchEl.value);
+        // Track intentional, complete numeric product-number searches only,
+        // not each partial keystroke (0, 00) or text/PII.
+        if (!/^\d{3,4}$/.test(query) || query === lastTrackedSearch) return;
+        lastTrackedSearch = query;
+        trackGtm({event: 'goodnote_search', search_string: query});
+        const product = items.find(item => String(item.id) === query);
+        if (product) trackProductView(product);
+      }
       function reset() { visibleCount=pageSize; render(); }
-      searchEl.addEventListener('input', reset);
-      clearEl.addEventListener('click',()=>{searchEl.value='';searchEl.focus();reset();});
+      searchEl.addEventListener('input', () => {
+        reset();
+        clearTimeout(searchTimer);
+        if (!/^\d{3,4}$/.test(normalizeIdQuery(searchEl.value))) {
+          lastTrackedSearch = null;
+          return;
+        }
+        searchTimer = setTimeout(trackCommittedSearch, 650);
+      });
+      searchEl.addEventListener('change', () => {
+        clearTimeout(searchTimer);
+        trackCommittedSearch();
+      });
+      clearEl.addEventListener('click',()=>{
+        clearTimeout(searchTimer);
+        lastTrackedSearch = null;
+        searchEl.value='';searchEl.focus();reset();
+      });
       sortEl.addEventListener('change',reset);
       loadEl.addEventListener('click',()=>{visibleCount+=pageSize;render();});
       document.getElementById('backTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
       const qItem=new URLSearchParams(location.search).get('item');
       if(qItem && /^\d{1,5}$/.test(qItem)) searchEl.value=qItem.padStart(3,'0');
       render();
+      // A direct product-number URL is a content view, not a new user search.
+      if (qItem && /^\d{1,5}$/.test(qItem)) {
+        const directProduct = items.find(item => String(item.id) === searchEl.value);
+        if (directProduct) trackProductView(directProduct);
+      }
     })();
   </script>
 </body>
