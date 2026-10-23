@@ -1,6 +1,6 @@
 # 좋은물건노트 — R010 사이트 UI 수정 / R009 간편 상품등록
 
-**2026-10-22 / R010 로컬 수정본 / GitHub Pages에 아직 배포하지 않음**
+**2026-10-24 / R010 + 003 상품 포함 배포용 확인본 / GitHub Pages에 아직 배포하지 않음**
 
 ## 현재 유효한 상품등록 규칙
 
@@ -21,6 +21,7 @@
 |---|---|---|
 | 001 | `https://coupa.ng/cqkhQb` | `partner-html/001.html` |
 | 002 | `https://coupa.ng/cqkhNh` | `partner-html/002.html` |
+| 003 | `https://coupa.ng/cqnN6I` | `partner-html/003.html` |
 
 R010 UI는 모바일 2열 / PC 4열, 번호 배지·테두리·쿠팡 iframe 카드, 상품번호 전용 검색, **최신 순 / 오래된 순 2개 정렬**, 12개씩 더보기를 유지합니다.
 

@@ -29,5 +29,11 @@ window.GOODNOTE_PRODUCTS = [
     "publishedAt": "2026-10-22",
     "sourceProductId": "9476453580",
     "sourceItemId": "28210816976"
+  },
+  {
+    "id": "003",
+    "name": "상품 003",
+    "partnerHtml": "<iframe src=\"https://coupa.ng/cqnN6I\" width=\"120\" height=\"240\" frameborder=\"0\" scrolling=\"no\" referrerpolicy=\"unsafe-url\"></iframe>",
+    "publishedAt": "2026-10-24"
   }
 ];
