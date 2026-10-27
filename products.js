@@ -59,5 +59,11 @@ window.GOODNOTE_PRODUCTS = [
     "name": "상품 007",
     "partnerHtml": "<iframe src=\"https://coupa.ng/cqrqoA\" width=\"120\" height=\"240\" frameborder=\"0\" scrolling=\"no\" referrerpolicy=\"unsafe-url\"></iframe>",
     "publishedAt": "2026-10-27"
+  },
+  {
+    "id": "008",
+    "name": "상품 008",
+    "partnerHtml": "<iframe src=\"https://coupa.ng/cqrS7N\" width=\"120\" height=\"240\" frameborder=\"0\" scrolling=\"no\" referrerpolicy=\"unsafe-url\"></iframe>",
+    "publishedAt": "2026-10-27"
   }
 ];
