@@ -73,6 +73,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .load-more{min-height:46px;padding:12px 26px;border:1px solid var(--ink);border-radius:10px;background:white;color:var(--ink);font-size:13px;font-weight:750}
 .load-more:hover{background:#edf1f2}
 .load-more[hidden]{display:none}
+/* Mobile/tablet-only numbered paging; desktop retains the 12-item load-more flow. */
+.pagination{display:none;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:24px 0 0}
+.pagination[hidden]{display:none!important}
+.page-button{min-width:44px;min-height:44px;padding:9px 12px;border:1px solid #cad4d6;border-radius:9px;background:#fff;color:var(--ink);font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.page-button:hover:not(:disabled){background:#edf1f2;border-color:#8a9ca5}
+.page-button[aria-current="page"]{background:var(--ink);color:#fff;border-color:var(--ink);cursor:default}
+.page-button:disabled{opacity:.42;cursor:not-allowed}
+.page-ellipsis{min-width:15px;display:inline-flex;justify-content:center;color:var(--muted);font-size:13px}
+@media(max-width:899px){.load-area{display:none}.pagination:not([hidden]){display:flex}}
 .footer-intro{text-align:center;margin:52px 0 21px;border-top:1px solid var(--line);padding-top:27px}
 .footer-intro strong{font-size:18px;letter-spacing:-.5px}
 .footer-intro p{margin:5px 0 0;color:var(--muted);font-size:12px}
@@ -120,7 +129,7 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
     <section aria-labelledby="items-title">
       <label class="search-wrap" for="search">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-        <input id="search" class="search" type="search" placeholder="상품번호 입력 (예: 001, 002)" autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="4" aria-label="상품번호 검색" />
+        <input id="search" class="search" type="search" placeholder="상품번호 입력 (예: 1, 10, 001)" autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="4" aria-label="상품번호 검색" />
         <button type="button" id="clear" class="clear" aria-label="검색어 지우기">지우기</button>
       </label>
       <div class="catalog-toolbar">
@@ -135,6 +144,7 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
       <p id="resultCount" class="result-count" aria-live="polite">0개 표시</p>
       <div id="products" class="products" aria-live="polite"></div>
       <div class="load-area"><button type="button" id="loadMore" class="load-more" hidden>상품 12개 더보기</button></div>
+      <nav id="pagination" class="pagination" aria-label="상품 목록 페이지" hidden></nav>
     </section>
     <section class="footer-intro" aria-label="좋은물건노트 소개">
       <strong>좋은물건노트</strong>
@@ -188,7 +198,10 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
       // Text metadata is rendered with textContent. The approved partner HTML is checked, then inserted verbatim.
       const items = source.filter(item => item && /^\d{3,}$/.test(String(item.id)) && typeof item.name === 'string');
       let visibleCount = 12;
-      const pageSize = 12;
+      const desktopPageSize = 12;
+      const mobilePageSize = 10;
+      const mobileMedia = window.matchMedia('(max-width: 899px)');
+      let currentPage = 1;
       const productEl = document.getElementById('products');
       const searchEl = document.getElementById('search');
       const clearEl = document.getElementById('clear');
@@ -196,7 +209,19 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
       const resultEl = document.getElementById('resultCount');
       const sortEl = document.getElementById('sort');
       const loadEl = document.getElementById('loadMore');
+      const pageNav = document.getElementById('pagination');
+      productEl.tabIndex = -1;
       const normalizeIdQuery = value => String(value ?? '').normalize('NFKC').trim();
+      // Visitors may omit left padding: 1 = 001, 10 = 010. Keep 0/00 as
+      // live prefixes so existing visitors can still browse the 00x numbers.
+      const matchesProductNumber = (query, storedId) => {
+        if (!query) return true;
+        if (!/^\d+$/.test(query)) return false;
+        const id = String(storedId);
+        if (query === '0' || query === '00') return id.startsWith(query);
+        const withoutPadding = value => value.replace(/^0+(?=\d)/, '');
+        return withoutPadding(query) === withoutPadding(id);
+      };
       // Privacy-minimal GTM dataLayer signals. These describe only real on-site
       // search/content views. TikTok mapping is configured separately in GTM.
       // Do not infer affiliate iframe clicks, purchases, prices or customer data.
@@ -325,25 +350,72 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
       }
       function matched() {
         const number = normalizeIdQuery(searchEl.value);
-        // Search exclusively by fixed product ID. Incomplete input (0, 00) shows
-        // prefix matches while the visitor types; item names never affect results.
-        return sortItems(items.filter(item => !number || (/^\d+$/.test(number) && String(item.id).startsWith(number))));
+        // Compare numeric product IDs without leading zeros, never names or descriptions.
+        // A single 0 or 00 retains the prior partial-prefix browsing behavior.
+        return sortItems(items.filter(item => matchesProductNumber(number, item.id)));
+      }
+      function renderPagination(pageCount) {
+        pageNav.replaceChildren();
+        pageNav.hidden = !mobileMedia.matches || pageCount <= 1;
+        if (pageNav.hidden) return;
+        const makeButton = (caption, target, ariaLabel, disabled, selected = false) => {
+          const button = el('button', 'page-button', caption);
+          button.type = 'button';
+          button.setAttribute('aria-label', ariaLabel);
+          if (selected) button.setAttribute('aria-current', 'page');
+          button.disabled = disabled;
+          button.addEventListener('click', () => {
+            if (target === currentPage || button.disabled) return;
+            currentPage = target;
+            render();
+            // Avoid leaving the visitor at the bottom after replacing the cards.
+            productEl.focus({preventScroll:true});
+            productEl.scrollIntoView({
+              block: 'start',
+              behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+            });
+          });
+          return button;
+        };
+        pageNav.append(makeButton('‹', currentPage - 1, '이전 페이지', currentPage === 1));
+        // Show the ends and nearby pages without overflowing narrow phones.
+        const visible = new Set([1, pageCount]);
+        for (let p = Math.max(1, currentPage - 1); p <= Math.min(pageCount, currentPage + 1); p++) visible.add(p);
+        const pages = [...visible].sort((a,b) => a-b);
+        let previous = 0;
+        for (const page of pages) {
+          if (page - previous > 1) {
+            const gap = el('span', 'page-ellipsis', '…');
+            gap.setAttribute('aria-hidden', 'true');
+            pageNav.append(gap);
+          }
+          pageNav.append(makeButton(String(page), page, `${page}페이지`, page === currentPage, page === currentPage));
+          previous = page;
+        }
+        pageNav.append(makeButton('›', currentPage + 1, '다음 페이지', currentPage === pageCount));
       }
       function render() {
         const q = searchEl.value.trim(); clearEl.style.display = q ? 'block' : 'none';
         const list = matched();
-        const showing = list.slice(0,visibleCount);
-        // Keep the live iframe in place when a search still shows the same items.
+        const mobile = mobileMedia.matches;
+        const pageCount = Math.ceil(list.length / mobilePageSize);
+        currentPage = Math.max(1, Math.min(currentPage, pageCount || 1));
+        const start = mobile ? (currentPage - 1) * mobilePageSize : 0;
+        const showing = mobile ? list.slice(start, start + mobilePageSize) : list.slice(0, visibleCount);
+        // Keep the live affiliate iframe in place when the visible products do not change.
         const nextIds = showing.map(item => item.id).join('|');
         if (nextIds !== displayedIds) {
           productEl.replaceChildren(...showing.map(card));
           displayedIds = nextIds;
         }
-        totalEl.textContent=`총 ${items.length}개`;
-        resultEl.textContent=`${list.length}개 중 ${showing.length}개 표시`;
-        const remaining=list.length-showing.length;
-        loadEl.hidden = remaining <= 0;
-        if (remaining > 0) loadEl.textContent=`상품 ${Math.min(pageSize,remaining)}개 더보기`;
+        totalEl.textContent = `총 ${items.length}개`;
+        resultEl.textContent = mobile && showing.length
+          ? `${list.length}개 중 ${start + 1}~${start + showing.length}개 표시`
+          : `${list.length}개 중 ${showing.length}개 표시`;
+        const remaining = list.length - showing.length;
+        loadEl.hidden = mobile || remaining <= 0;
+        if (!mobile && remaining > 0) loadEl.textContent = `상품 ${Math.min(desktopPageSize, remaining)}개 더보기`;
+        renderPagination(pageCount);
         if (list.length === 0 && !productEl.querySelector('.empty')) {
           const empty=el('div','empty'); empty.append(el('strong','', '찾는 상품이 없어요'));
           empty.append(el('span','', /^\d+$/.test(normalizeIdQuery(searchEl.value)) ? '상품번호를 다시 확인해 주세요.' : '상품번호는 숫자만 입력해 주세요.')); productEl.append(empty);
@@ -363,19 +435,20 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
       }
       function trackCommittedSearch() {
         const query = normalizeIdQuery(searchEl.value);
-        // Track intentional, complete numeric product-number searches only,
-        // not each partial keystroke (0, 00) or text/PII.
-        if (!/^\d{3,4}$/.test(query) || query === lastTrackedSearch) return;
+        // After a short pause, count 1/10/001/010 as valid product-number searches.
+        // 0/00 are unfinished prefixes, and text/PII must never be tracked.
+        if (!/^\d{1,4}$/.test(query) || /^0+$/.test(query) || query === lastTrackedSearch) return;
         lastTrackedSearch = query;
         trackGtm({event: 'goodnote_search', search_string: query});
-        const product = items.find(item => String(item.id) === query);
+        const product = items.find(item => matchesProductNumber(query, item.id));
         if (product) trackProductView(product);
       }
-      function reset() { visibleCount=pageSize; render(); }
+      function reset() { currentPage=1; visibleCount=desktopPageSize; render(); }
       searchEl.addEventListener('input', () => {
         reset();
         clearTimeout(searchTimer);
-        if (!/^\d{3,4}$/.test(normalizeIdQuery(searchEl.value))) {
+        const query = normalizeIdQuery(searchEl.value);
+        if (!/^\d{1,4}$/.test(query) || /^0+$/.test(query)) {
           lastTrackedSearch = null;
           return;
         }
@@ -391,14 +464,17 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
         searchEl.value='';searchEl.focus();reset();
       });
       sortEl.addEventListener('change',reset);
-      loadEl.addEventListener('click',()=>{visibleCount+=pageSize;render();});
+      loadEl.addEventListener('click',()=>{visibleCount+=desktopPageSize;render();});
+      const handleLayoutChange = () => { currentPage=1; visibleCount=desktopPageSize; render(); };
+      if (typeof mobileMedia.addEventListener === 'function') mobileMedia.addEventListener('change',handleLayoutChange);
+      else mobileMedia.addListener(handleLayoutChange);
       document.getElementById('backTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
       const qItem=new URLSearchParams(location.search).get('item');
       if(qItem && /^\d{1,5}$/.test(qItem)) searchEl.value=qItem.padStart(3,'0');
       render();
       // A direct product-number URL is a content view, not a new user search.
       if (qItem && /^\d{1,5}$/.test(qItem)) {
-        const directProduct = items.find(item => String(item.id) === searchEl.value);
+        const directProduct = items.find(item => matchesProductNumber(searchEl.value, item.id));
         if (directProduct) trackProductView(directProduct);
       }
     })();
