@@ -118,13 +118,24 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
 .direct-store-card .jnj-image-box{width:120px;height:115px;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa}
 .direct-store-card .jnj-image{width:100%;height:100%;object-fit:contain;background:#fff;display:block}
 .direct-store-card .jnj-image[hidden],.direct-store-card .jnj-image-wait[hidden]{display:none!important}
+.direct-store-card .jnj-image[hidden]{display:none}
 .direct-store-card .jnj-image-wait{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f7f7f7;color:#777;font-size:11px;text-align:center;line-height:1.4}
 .direct-store-card .jnj-mini-name{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:34px;flex:none;margin:5px 1px 0;font-size:10px;line-height:17px;font-weight:700;word-break:keep-all}
-.direct-store-card .jnj-price{font-size:14px;line-height:22px;font-weight:850;color:#222;padding-left:1px}
 /* 020 only: mimic the familiar centered, blue pill-shaped Coupang shop button. */
 .direct-store-card .jnj-mini-button{box-sizing:border-box;display:flex;align-items:center;justify-content:center;align-self:center;flex:0 0 29px;width:76px;min-height:29px;height:29px;margin:auto auto 12px;padding:0 5px;border:0;border-radius:999px;text-align:center;text-decoration:none;background:#3478f6;color:#fff;font-size:12px;line-height:1;font-weight:800;white-space:nowrap;box-shadow:none;transition:background-color .15s ease}
 .direct-store-card .jnj-mini-button:hover{background:#2465df;color:#fff}
 .direct-store-card .jnj-mini-button:focus-visible{outline:2px solid #1544af;outline-offset:3px}
+
+/* 2026-11: conspicuous, unconditional Coupang Partners disclosure */
+.partner-disclosure{margin:0 0 22px;padding:15px 17px;background:#fff7f5;border:1px solid #e8c3ba;border-left:5px solid #b63a34;border-radius:9px;color:#253e4a}
+.partner-disclosure-title{display:flex;align-items:center;gap:9px;margin:0 0 6px;color:#9b272a;font-size:15px;font-weight:850;line-height:1.45}
+.partner-disclosure .ad-label{display:inline-block;background:#a7252a;color:#fff;font-size:12px;font-weight:800;line-height:1.2;padding:4px 7px;border-radius:4px}
+.partner-disclosure p{font-size:15px;font-weight:700;line-height:1.7;margin:0;word-break:keep-all}
+.partner-disclosure small{display:block;margin-top:6px;font-size:12px;color:#536671;line-height:1.6}
+.product-head .product-ad-label{display:inline-flex;margin-left:auto;align-items:center;justify-content:center;color:#982d31;font-size:11px;font-weight:800;line-height:1;border:1px solid #dcb5b4;border-radius:4px;padding:4px 6px}
+.product-head .product-ad-label.direct-label{color:#536671;border-color:#bdc9cc}
+@media(max-width:600px){.partner-disclosure{margin:0 0 18px;padding:12px 13px}.partner-disclosure p{font-size:14px}.partner-disclosure-title{font-size:14px}.partner-disclosure small{font-size:11px}}
+
 </style>
 </head>
 <body>
@@ -139,6 +150,11 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
     <section class="intro" aria-labelledby="hero-title">
       <h1 id="hero-title">쇼츠에서 본 상품을 찾아보세요</h1>
       <p>상품번호를 입력하면 소개한 물건을 바로 찾을 수 있어요.</p>
+    </section>
+    <section class="partner-disclosure" aria-label="쿠팡 파트너스 대가성 표시">
+      <div class="partner-disclosure-title"><span class="ad-label">광고</span><span>쿠팡 파트너스 안내 (001~019번 상품)</span></div>
+      <p>이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+      <small>020번은 쿠팡 파트너스 제휴 상품이 아닌 별도 파트너 상품입니다.</small>
     </section>
     <section aria-labelledby="items-title">
       <label class="search-wrap" for="search">
@@ -177,7 +193,7 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
     </section>
     <section class="notice" aria-label="제휴 안내">
       <div class="notice-title">제휴 링크 안내</div>
-      <p>이 사이트에는 쿠팡 파트너스 제휴 링크가 포함될 수 있으며, 링크를 통한 구매 시 일정액의 수수료를 제공받을 수 있습니다. 구매 가격에 추가 요금이 붙는다는 의미는 아닙니다. 상품 가격과 옵션, 배송 조건은 판매 페이지에서 최종 확인해 주세요.</p>
+      <p>001~019번 상품은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다. 020번은 쿠팡 파트너스 제휴 상품이 아닌 별도 파트너 상품입니다. 상품 가격과 옵션, 배송 조건은 판매 페이지에서 최종 확인해 주세요.</p>
     </section>
     <section class="contact-section" aria-label="광고·협업 문의">
       <a class="contact-badge" href="mailto:smtm1389@gmail.com" aria-label="광고·협업 문의: smtm1389@gmail.com으로 이메일 보내기">
@@ -204,13 +220,28 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
       else window.addEventListener('resize', fitCarousel);
     })();
   </script>
-  <script src="products.js"></script>
+  <script src="products.js?v=20261109-020-cardfix-2"></script>
   <script>
     (() => {
       'use strict';
       const source = Array.isArray(window.GOODNOTE_PRODUCTS) ? window.GOODNOTE_PRODUCTS : [];
       // Text metadata is rendered with textContent. The approved partner HTML is checked, then inserted verbatim.
+      // Safety net: if an older products.js was cached during deployment, keep 020 visible.
+      // Other products (001-019) remain untouched; the same product data lives in products.js.
+      const official020 = {
+        id: '020',
+        name: '모이사나이트 실버925 베이직 가드링 JRM010',
+        storeUrl: 'https://jnjstore.co.kr/product/detail.html?product_no=399',
+        storeName: '제이앤제이',
+        sourceImageFilename: '93f3a258967088fee0811f650b271c58.jpg',
+        material: '실버925 · 화이트골드 도금',
+        feature: '모이사나이트 1.5mm × 17개',
+        publishedAt: '2026-11-09'
+      };
       const items = source.filter(item => item && /^\d{3,}$/.test(String(item.id)) && typeof item.name === 'string');
+      const twentyIndex = items.findIndex(item => item.id === '020');
+      if (twentyIndex < 0) items.push(official020);
+      else if (items[twentyIndex].storeUrl !== official020.storeUrl) items[twentyIndex] = official020;
       let visibleCount = 12;
       const desktopPageSize = 12;
       const mobilePageSize = 10;
@@ -386,7 +417,7 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
         const head = el('div', 'product-head');
         const badge = el('span', 'product-number', data.id);
         badge.setAttribute('aria-label', `상품번호 ${data.id}`);
-        head.append(badge);
+        head.append(badge, el('span', 'product-ad-label direct-label', '파트너 상품'));
         const slot = el('div','partner-slot');
         const mini = el('div','jnj-mini-card');
         const imageBox = el('div','jnj-image-box');
@@ -399,13 +430,12 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
         const wait = el('span','jnj-image-wait','대표이미지 확인 중');
         imageBox.append(image, wait);
         const title=el('span','jnj-mini-name','모이사나이트 실버925 일자 베이직 가드링');
-        const price=el('strong','jnj-price','49,800원');
         const btn=el('a','jnj-mini-button','쇼핑하기');
         btn.href=data.storeUrl;
         btn.target='_blank';
         btn.rel='noopener noreferrer';
-        btn.setAttribute('aria-label',`${data.name}, 제이앤제이 자사몰에서 쇼핑하기`);
-        mini.append(imageBox,title,price,btn);
+        btn.setAttribute('aria-label',`${data.name}, 제이앤제이 파트너 상품 상세페이지에서 쇼핑하기`);
+        mini.append(imageBox,title,btn);
         slot.append(mini);
         outer.append(head,slot);
         findJnjImage(image, wait);
@@ -420,7 +450,7 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
         const head = el('div', 'product-head');
         const badge = el('span', 'product-number', data.id);
         badge.setAttribute('aria-label', `상품번호 ${data.id}`);
-        head.append(badge);
+        head.append(badge, el('span', 'product-ad-label', '광고'));
         const slot = el('div', 'partner-slot');
         if (approvedPartnerHTML(data.partnerHtml)) {
           // Insert the EXACT supplied string; all styling belongs to the wrapper.
