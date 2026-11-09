@@ -111,6 +111,20 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
 @media(max-width:340px){.page{width:calc(100% - 20px)}.products{gap:8px}.product-head{padding:10px 8px 0}}
 @media(max-width:305px){.products{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+
+/* 020: match the native 120x240 Coupang placement; never touch partner iframe styles. */
+.direct-store-card .partner-slot{padding:12px 8px 16px;min-height:268px}
+.direct-store-card .jnj-mini-card{box-sizing:border-box;width:120px;height:240px;flex:none;display:flex;flex-direction:column;align-items:stretch;overflow:hidden;background:#fff;color:#222;font-family:Arial,"Malgun Gothic",sans-serif;font-size:11px;line-height:1.35;text-align:left}
+.direct-store-card .jnj-image-box{width:120px;height:115px;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa}
+.direct-store-card .jnj-image{width:100%;height:100%;object-fit:contain;background:#fff;display:block}
+.direct-store-card .jnj-image[hidden],.direct-store-card .jnj-image-wait[hidden]{display:none!important}
+.direct-store-card .jnj-image-wait{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f7f7f7;color:#777;font-size:11px;text-align:center;line-height:1.4}
+.direct-store-card .jnj-mini-name{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:34px;flex:none;margin:5px 1px 0;font-size:10px;line-height:17px;font-weight:700;word-break:keep-all}
+.direct-store-card .jnj-price{font-size:14px;line-height:22px;font-weight:850;color:#222;padding-left:1px}
+/* 020 only: mimic the familiar centered, blue pill-shaped Coupang shop button. */
+.direct-store-card .jnj-mini-button{box-sizing:border-box;display:flex;align-items:center;justify-content:center;align-self:center;flex:0 0 29px;width:76px;min-height:29px;height:29px;margin:auto auto 12px;padding:0 5px;border:0;border-radius:999px;text-align:center;text-decoration:none;background:#3478f6;color:#fff;font-size:12px;line-height:1;font-weight:800;white-space:nowrap;box-shadow:none;transition:background-color .15s ease}
+.direct-store-card .jnj-mini-button:hover{background:#2465df;color:#fff}
+.direct-store-card .jnj-mini-button:focus-visible{outline:2px solid #1544af;outline-offset:3px}
 </style>
 </head>
 <body>
@@ -319,7 +333,86 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
         } catch { return false; }
         return !frame.textContent.trim();
       }
+      // 020: official storefront image, same visible 120x240 footprint as Coupang.
+      // Cafe24 stores images in a dated folder. Probe only the merchant's image host.
+      // No product artwork is generated or substituted from another merchant.
+      function findJnjImage(imageNode, waitNode) {
+        const fileName = '93f3a258967088fee0811f650b271c58.jpg';
+        let months = [];
+        for (let y=2026; y>=2023; --y) {
+          for (let m=12; m>=1; --m) {
+            if (y===2026 && m>11) continue;
+            months.push(`${y}${String(m).padStart(2,'0')}`);
+          }
+        }
+        const hosts = ['https://jnjstore.co.kr','https://www.jnjstore.co.kr'];
+        const urls = [];
+        for(const host of hosts) {
+          for(const folder of ['medium','big','small']) {
+            for(const ym of months) urls.push(`${host}/web/product/${folder}/${ym}/${fileName}`);
+          }
+        }
+        // Limited parallel probes avoid blocking the UI; the first valid source wins.
+        let next = 0, settled = false, finished = 0;
+        const limit = 5;
+        const total = urls.length;
+        function worker() {
+          if (settled || next >= total) return;
+          const url=urls[next++];
+          const probe=new Image();
+          probe.onload=()=>{
+            if(settled) return;
+            if (probe.naturalWidth < 32 || probe.naturalHeight < 32) { finished++; worker(); return; }
+            settled=true;
+            imageNode.src=url;
+            imageNode.hidden=false;
+            waitNode.hidden=true;
+          };
+          probe.onerror=()=>{
+            finished++;
+            if(!settled && finished===total) {
+              waitNode.textContent='상품사진 불러오기 실패';
+            } else worker();
+          };
+          probe.src=url;
+        }
+        for(let i=0;i<Math.min(limit,total);i++) worker();
+      }
+      function directStoreCard(data) {
+        const exactStoreUrl = 'https://jnjstore.co.kr/product/detail.html?product_no=399';
+        if (data.id !== '020' || data.storeUrl !== exactStoreUrl) return legacyCard(data);
+        const outer = el('article', 'product direct-store-card');
+        outer.setAttribute('aria-label', `상품번호 ${data.id}, ${data.name}`);
+        const head = el('div', 'product-head');
+        const badge = el('span', 'product-number', data.id);
+        badge.setAttribute('aria-label', `상품번호 ${data.id}`);
+        head.append(badge);
+        const slot = el('div','partner-slot');
+        const mini = el('div','jnj-mini-card');
+        const imageBox = el('div','jnj-image-box');
+        const image = document.createElement('img');
+        image.className='jnj-image';
+        image.alt='제이앤제이 모이사나이트 실버925 베이직 가드링 JRM010';
+        image.width=120;
+        image.height=115;
+        image.hidden=true;
+        const wait = el('span','jnj-image-wait','대표이미지 확인 중');
+        imageBox.append(image, wait);
+        const title=el('span','jnj-mini-name','모이사나이트 실버925 일자 베이직 가드링');
+        const price=el('strong','jnj-price','49,800원');
+        const btn=el('a','jnj-mini-button','쇼핑하기');
+        btn.href=data.storeUrl;
+        btn.target='_blank';
+        btn.rel='noopener noreferrer';
+        btn.setAttribute('aria-label',`${data.name}, 제이앤제이 자사몰에서 쇼핑하기`);
+        mini.append(imageBox,title,price,btn);
+        slot.append(mini);
+        outer.append(head,slot);
+        findJnjImage(image, wait);
+        return outer;
+      }
       function card(data) {
+        if (data.id === '020' && data.storeUrl) return directStoreCard(data);
         // Keep existing products intact until THEIR official HTML is supplied.
         if (!Object.prototype.hasOwnProperty.call(data, 'partnerHtml')) return legacyCard(data);
         const outer = el('article', 'product');

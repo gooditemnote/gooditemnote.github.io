@@ -134,8 +134,12 @@ window.GOODNOTE_PRODUCTS = [
   },
   {
     "id": "020",
-    "name": "상품 020",
-    "partnerHtml": "<iframe src=\"https://coupa.ng/cqNdIt\" width=\"120\" height=\"240\" frameborder=\"0\" scrolling=\"no\" referrerpolicy=\"unsafe-url\"></iframe>",
+    "name": "모이사나이트 실버925 베이직 가드링 JRM010",
+    "storeUrl": "https://jnjstore.co.kr/product/detail.html?product_no=399",
+    "storeName": "제이앤제이",
+    "sourceImageFilename": "93f3a258967088fee0811f650b271c58.jpg",
+    "material": "실버925 · 화이트골드 도금",
+    "feature": "모이사나이트 1.5mm × 17개",
     "publishedAt": "2026-11-09"
   }
 ];
