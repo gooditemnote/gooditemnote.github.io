@@ -141,5 +141,11 @@ window.GOODNOTE_PRODUCTS = [
     "material": "실버925 · 화이트골드 도금",
     "feature": "모이사나이트 1.5mm × 17개",
     "publishedAt": "2026-11-09"
+  },
+  {
+    "id": "021",
+    "name": "상품 021",
+    "partnerHtml": "<iframe src=\"https://coupa.ng/cqQ16y\" width=\"120\" height=\"240\" frameborder=\"0\" scrolling=\"no\" referrerpolicy=\"unsafe-url\"></iframe>",
+    "publishedAt": "2026-11-10"
   }
 ];
