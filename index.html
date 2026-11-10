@@ -126,15 +126,13 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
 .direct-store-card .jnj-mini-button:hover{background:#2465df;color:#fff}
 .direct-store-card .jnj-mini-button:focus-visible{outline:2px solid #1544af;outline-offset:3px}
 
-/* 2026-11: conspicuous, unconditional Coupang Partners disclosure */
+/* 2026-11: conspicuous unified affiliate disclosure */
 .partner-disclosure{margin:0 0 22px;padding:15px 17px;background:#fff7f5;border:1px solid #e8c3ba;border-left:5px solid #b63a34;border-radius:9px;color:#253e4a}
 .partner-disclosure-title{display:flex;align-items:center;gap:9px;margin:0 0 6px;color:#9b272a;font-size:15px;font-weight:850;line-height:1.45}
 .partner-disclosure .ad-label{display:inline-block;background:#a7252a;color:#fff;font-size:12px;font-weight:800;line-height:1.2;padding:4px 7px;border-radius:4px}
 .partner-disclosure p{font-size:15px;font-weight:700;line-height:1.7;margin:0;word-break:keep-all}
-.partner-disclosure small{display:block;margin-top:6px;font-size:12px;color:#536671;line-height:1.6}
 .product-head .product-ad-label{display:inline-flex;margin-left:auto;align-items:center;justify-content:center;color:#982d31;font-size:11px;font-weight:800;line-height:1;border:1px solid #dcb5b4;border-radius:4px;padding:4px 6px}
-.product-head .product-ad-label.direct-label{color:#536671;border-color:#bdc9cc}
-@media(max-width:600px){.partner-disclosure{margin:0 0 18px;padding:12px 13px}.partner-disclosure p{font-size:14px}.partner-disclosure-title{font-size:14px}.partner-disclosure small{font-size:11px}}
+@media(max-width:600px){.partner-disclosure{margin:0 0 18px;padding:12px 13px}.partner-disclosure p{font-size:14px}.partner-disclosure-title{font-size:14px}}
 
 </style>
 </head>
@@ -151,10 +149,9 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
       <h1 id="hero-title">쇼츠에서 본 상품을 찾아보세요</h1>
       <p>상품번호를 입력하면 소개한 물건을 바로 찾을 수 있어요.</p>
     </section>
-    <section class="partner-disclosure" aria-label="쿠팡 파트너스 대가성 표시">
-      <div class="partner-disclosure-title"><span class="ad-label">광고</span><span>쿠팡 파트너스 안내 (001~019번 및 021번 상품)</span></div>
-      <p>이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
-      <small>020번은 쿠팡 파트너스 제휴 상품이 아닌 별도 파트너 상품입니다.</small>
+    <section class="partner-disclosure" aria-label="광고 및 제휴 안내">
+      <div class="partner-disclosure-title"><span class="ad-label">광고</span><span>· 제휴 안내</span></div>
+      <p>이 페이지는 쿠팡 파트너스를 포함한 제휴 마케팅 활동에 참여하며, 이에 따른 일정액의 수수료를 제공받습니다.</p>
     </section>
     <section aria-labelledby="items-title">
       <label class="search-wrap" for="search">
@@ -191,10 +188,7 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
         </div>
       </div>
     </section>
-    <section class="notice" aria-label="제휴 안내">
-      <div class="notice-title">제휴 링크 안내</div>
-      <p>001~019번 및 021번 상품은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다. 020번은 쿠팡 파트너스 제휴 상품이 아닌 별도 파트너 상품입니다. 상품 가격과 옵션, 배송 조건은 판매 페이지에서 최종 확인해 주세요.</p>
-    </section>
+
     <section class="contact-section" aria-label="광고·협업 문의">
       <a class="contact-badge" href="mailto:smtm1389@gmail.com" aria-label="광고·협업 문의: smtm1389@gmail.com으로 이메일 보내기">
         <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
@@ -220,7 +214,7 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
       else window.addEventListener('resize', fitCarousel);
     })();
   </script>
-  <script src="products.js?v=20261110-021-register-1"></script>
+  <script src="products.js?v=20261110-021-unified-disclosure-1"></script>
   <script>
     (() => {
       'use strict';
@@ -417,7 +411,7 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
         const head = el('div', 'product-head');
         const badge = el('span', 'product-number', data.id);
         badge.setAttribute('aria-label', `상품번호 ${data.id}`);
-        head.append(badge, el('span', 'product-ad-label direct-label', '파트너 상품'));
+        head.append(badge, el('span', 'product-ad-label', '광고'));
         const slot = el('div','partner-slot');
         const mini = el('div','jnj-mini-card');
         const imageBox = el('div','jnj-image-box');
@@ -434,7 +428,7 @@ footer{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;padding:15px 
         btn.href=data.storeUrl;
         btn.target='_blank';
         btn.rel='noopener noreferrer';
-        btn.setAttribute('aria-label',`${data.name}, 제이앤제이 파트너 상품 상세페이지에서 쇼핑하기`);
+        btn.setAttribute('aria-label',`${data.name}, 쇼핑하기`);
         mini.append(imageBox,title,btn);
         slot.append(mini);
         outer.append(head,slot);
